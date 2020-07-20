@@ -11,7 +11,7 @@ fn main() {
             break colors;
         }
     };
-    let repitition = loop {
+    let repetition = loop {
         let mut buffer = String::new();
         println!("Do you allow repetition?(y/N):");
         stdin().read_line(&mut buffer).unwrap();
@@ -22,5 +22,5 @@ fn main() {
         };
     };
     println!("{}", colors);
-    println!("{}", repitition);
+    println!("{}", repetition);
 }
