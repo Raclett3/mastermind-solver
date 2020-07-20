@@ -1,4 +1,8 @@
+extern crate itertools;
+mod solver;
+
 use std::io::stdin;
+use solver::*;
 
 fn prompt_usize(prompt: &str) -> usize {
     loop {
@@ -30,7 +34,6 @@ fn main() {
         eprintln!("Length of the answer should be larger than kinds of colors if the answer has no color repetition");
         std::process::exit(1);
     }
-    println!("{}", colors);
-    println!("{}", answer_len);
-    println!("{}", repetition);
+    let answers: Vec<_> = all_answers(colors, answer_len, repetition);
+    println!("{:?}", answers);
 }
