@@ -31,3 +31,10 @@ pub fn evaluate_answer(answer: &[usize], actual: &[usize], colors: usize) -> (us
         .sum();
     (hits, blows)
 }
+
+pub fn possible_hits_blows(answer_len: usize) -> Vec<(usize, usize)> {
+    (0..=answer_len)
+        .flat_map(|x| (0..=x).map(move |y| (y, x - y)))
+        .filter(|x| *x != (answer_len - 1, 1))
+        .collect()
+}
