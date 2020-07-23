@@ -12,6 +12,15 @@ pub fn all_answers(colors: usize, len: usize, repetition: bool) -> Vec<Vec<usize
     }
 }
 
+pub fn unique_answers(colors: usize, len: usize, repetition: bool) -> Vec<Vec<usize>> {
+    let max = std::cmp::min(len, colors);
+    if repetition {
+        (0..max).combinations_with_replacement(len).collect()
+    } else {
+        (0..max).combinations(len).collect()
+    }
+}
+
 pub fn evaluate_answer(answer: &[usize], actual: &[usize], colors: usize) -> (usize, usize) {
     let mut answer_colors_count = vec![0; colors];
     let mut actual_colors_count = vec![0; colors];
@@ -36,6 +45,7 @@ pub fn evaluate_answer(answer: &[usize], actual: &[usize], colors: usize) -> (us
 pub struct Solver {
     all_answers: Vec<Vec<usize>>,
     possible_answers: Vec<usize>,
+    unique_answers: Vec<Vec<usize>>,
     colors: usize,
 }
 
@@ -46,13 +56,18 @@ impl Solver {
         Self {
             all_answers: answers,
             possible_answers: (0..len).collect(),
+            unique_answers: unique_answers(colors, answer_len, repetition),
             colors,
         }
     }
 
     pub fn next_answer(&mut self) -> Vec<usize> {
-        let (next, _) = self
-            .all_answers
+        let answers = if self.all_answers.len() == self.possible_answers.len() {
+            &self.unique_answers
+        } else {
+            &self.all_answers
+        };
+        let (next, _) = answers
             .iter()
             .map(|answer| {
                 let mut cnt = HashMap::new();
