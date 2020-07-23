@@ -33,17 +33,9 @@ pub fn evaluate_answer(answer: &[usize], actual: &[usize], colors: usize) -> (us
     (hits, blows)
 }
 
-pub fn possible_hits_blows(answer_len: usize) -> Vec<(usize, usize)> {
-    (0..=answer_len)
-        .flat_map(|x| (0..=x).map(move |y| (y, x - y)))
-        .filter(|x| *x != (answer_len - 1, 1))
-        .collect()
-}
-
 pub struct Solver {
     all_answers: Vec<Vec<usize>>,
     possible_answers: Vec<usize>,
-    hits_blows: Vec<(usize, usize)>,
     colors: usize,
 }
 
@@ -54,7 +46,6 @@ impl Solver {
         Self {
             all_answers: answers,
             possible_answers: (0..len).collect(),
-            hits_blows: possible_hits_blows(answer_len),
             colors,
         }
     }
@@ -69,13 +60,10 @@ impl Solver {
                     println!("{}", index);
                 }
                 let mut cnt = HashMap::new();
-                for x in &self.hits_blows {
-                    cnt.insert(*x, 0);
-                }
                 for i in &self.possible_answers {
                     let actual = &self.all_answers[*i];
                     let hits_blows = evaluate_answer(answer, actual, self.colors);
-                    cnt.insert(hits_blows, cnt.get(&hits_blows).unwrap() + 1);
+                    cnt.insert(hits_blows, cnt.get(&hits_blows).unwrap_or(&0) + 1);
                 }
                 (answer, cnt.iter().map(|(_, x)| *x).max().unwrap())
             })

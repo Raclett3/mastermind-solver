@@ -17,9 +17,4 @@ mod test {
         assert_eq!(solver::evaluate_answer(&[2, 3, 4, 5], &[3, 4, 5, 2], 6), (0, 4));
         assert_eq!(solver::evaluate_answer(&[2, 2, 3, 3], &[0, 1, 2, 3], 6), (1, 1));
     }
-
-    #[test]
-    fn hits_blows() {
-        assert_eq!(solver::possible_hits_blows(3), vec![(0, 0), (0, 1), (1, 0), (0, 2), (1, 1), (2, 0), (0, 3), (1, 2), (3, 0)]);
-    }
 }
