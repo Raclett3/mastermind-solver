@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use std::collections::HashMap;
 
 pub fn all_answers(colors: usize, len: usize, repetition: bool) -> Vec<Vec<usize>> {
     if repetition {
@@ -37,4 +38,70 @@ pub fn possible_hits_blows(answer_len: usize) -> Vec<(usize, usize)> {
         .flat_map(|x| (0..=x).map(move |y| (y, x - y)))
         .filter(|x| *x != (answer_len - 1, 1))
         .collect()
+}
+
+pub struct Solver {
+    all_answers: Vec<Vec<usize>>,
+    possible_answers: Vec<usize>,
+    hits_blows: Vec<(usize, usize)>,
+    colors: usize,
+}
+
+impl Solver {
+    pub fn new(colors: usize, answer_len: usize, repetition: bool) -> Self {
+        let answers = all_answers(colors, answer_len, repetition);
+        let len = answers.len();
+        Self {
+            all_answers: answers,
+            possible_answers: (0..len).collect(),
+            hits_blows: possible_hits_blows(answer_len),
+            colors,
+        }
+    }
+
+    pub fn next_answer(&mut self) -> Vec<usize> {
+        let (next, _) = self
+            .all_answers
+            .iter()
+            .enumerate()
+            .map(|(index, answer)| {
+                if index % 10 == 0 {
+                    println!("{}", index);
+                }
+                let mut cnt = HashMap::new();
+                for x in &self.hits_blows {
+                    cnt.insert(*x, 0);
+                }
+                for i in &self.possible_answers {
+                    let actual = &self.all_answers[*i];
+                    let hits_blows = evaluate_answer(answer, actual, self.colors);
+                    cnt.insert(hits_blows, cnt.get(&hits_blows).unwrap() + 1);
+                }
+                (answer, cnt.iter().map(|(_, x)| *x).max().unwrap())
+            })
+            .fold1(|acc, x| if acc.1 > x.1 { x } else { acc })
+            .unwrap();
+        next.clone()
+    }
+
+    pub fn process_answer(&mut self, answer: &[usize], hits_blows: (usize, usize)) {
+        self.possible_answers = self
+            .possible_answers
+            .iter()
+            .filter(|x| evaluate_answer(&self.all_answers[**x], answer, self.colors) == hits_blows)
+            .copied()
+            .collect();
+    }
+
+    pub fn solved(&self) -> bool {
+        self.possible_answers.len() <= 1
+    }
+
+    pub fn answer(&self) -> Option<Vec<usize>> {
+        if self.possible_answers.len() == 1{
+            Some(self.all_answers[self.possible_answers[0]].clone())
+        } else {
+            None
+        }
+    }
 }

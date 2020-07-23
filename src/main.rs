@@ -2,8 +2,7 @@ extern crate itertools;
 mod solver;
 
 use itertools::Itertools;
-use solver::*;
-use std::collections::HashMap;
+use solver::Solver;
 use std::io::stdin;
 
 fn prompt_usize(prompt: &str) -> usize {
@@ -37,25 +36,9 @@ fn main() {
         std::process::exit(1);
     }
 
-    let answers = all_answers(colors, answer_len, repetition);
-    let mut filtered: Vec<_> = answers.iter().collect();
-    let all_hits_blows = possible_hits_blows(answer_len);
-    while filtered.len() > 1 {
-        let (next, _) = answers
-            .iter()
-            .map(|answer| {
-                let mut cnt = HashMap::new();
-                for x in &all_hits_blows {
-                    cnt.insert(*x, 0);
-                }
-                for actual in &filtered {
-                    let hits_blows = evaluate_answer(answer, actual, colors);
-                    cnt.insert(hits_blows, cnt.get(&hits_blows).unwrap() + 1);
-                }
-                (answer, cnt.iter().map(|(_, x)| *x).max().unwrap())
-            })
-            .fold1(|acc, x| if acc.1 > x.1 { x } else { acc })
-            .unwrap();
+    let mut solver = Solver::new(colors, answer_len, repetition);
+    while !solver.solved() {
+        let next = solver.next_answer();
 
         println!("{}", next.iter().map(|x| x.to_string()).join(" "));
         let hits_blows = loop {
@@ -67,14 +50,10 @@ fn main() {
             }
             break (nums[0], nums[1]);
         };
-
-        filtered = filtered
-            .iter()
-            .filter(|x| evaluate_answer(x, next, colors) == hits_blows)
-            .copied()
-            .collect();
+        solver.process_answer(&next, hits_blows);
     }
-    if filtered.len() == 1 {
-        println!("{}", filtered[0].iter().map(|x| x.to_string()).join(" "));
+
+    if let Some(answer) = solver.answer() {
+        println!("{}", answer.iter().map(|x| x.to_string()).join(" "));
     }
 }
