@@ -54,11 +54,7 @@ impl Solver {
         let (next, _) = self
             .all_answers
             .iter()
-            .enumerate()
-            .map(|(index, answer)| {
-                if index % 10 == 0 {
-                    println!("{}", index);
-                }
+            .map(|answer| {
                 let mut cnt = HashMap::new();
                 for i in &self.possible_answers {
                     let actual = &self.all_answers[*i];
