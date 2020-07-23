@@ -19,11 +19,11 @@ fn prompt_usize(prompt: &str) -> usize {
 
 fn main() {
     println!("Mastermind solver");
-    let colors = prompt_usize("How many kinds of colors does answer have?:");
-    let answer_len = prompt_usize("How many colors does answer have?:");
+    let colors = prompt_usize("How many colors of pegs are there?:");
+    let answer_len = prompt_usize("How many pegs does the answer have?:");
     let repetition = loop {
         let mut buffer = String::new();
-        println!("Do you allow repetition?(y/N):");
+        println!("Could the answer have pegs colored the same?(y/N):");
         stdin().read_line(&mut buffer).unwrap();
         break match buffer.chars().next().unwrap() {
             'Y' | 'y' => true,
@@ -40,7 +40,8 @@ fn main() {
     while !solver.solved() {
         let next = solver.next_answer();
 
-        println!("{}", next.iter().map(|x| x.to_string()).join(" "));
+        println!("The nest guess is: {}", next.iter().map(|x| x.to_string()).join(" "));
+        println!("How many hits/blows are there with this guess? (Input space-separated value):");
         let hits_blows = loop {
             let mut buffer = String::new();
             stdin().read_line(&mut buffer).unwrap();
@@ -54,6 +55,8 @@ fn main() {
     }
 
     if let Some(answer) = solver.answer() {
-        println!("{}", answer.iter().map(|x| x.to_string()).join(" "));
+        println!("The answer is: {}", answer.iter().map(|x| x.to_string()).join(" "));
+    } else {
+        println!("Some condition conflicts: there's no answer.");
     }
 }
